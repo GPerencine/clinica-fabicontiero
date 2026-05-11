@@ -1,0 +1,32 @@
+name: Testes Automatizados (CI)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Baixando o código do repositório
+      uses: actions/checkout@v4
+
+    - name: Configurando o Node.js 18
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'backend/package-lock.json'
+
+    - name: Instalando dependências (Backend)
+      run: |
+        cd backend
+        npm ci
+
+    - name: Rodando os Testes (Backend)
+      run: |
+        cd backend
+        npm test

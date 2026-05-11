@@ -1,0 +1,596 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* =====================================================
+   TOKENS — mantidos em sincronia com Home.css
+===================================================== */
+:root {
+  --gold:       #d4a373;
+  --gold-light: #e6be94;
+  --gold-dark:  #a67c52;
+  --bg-nude:    #f9f6f2;
+  --bg-card:    #ffffff;
+  --text-main:  #2c2c2c;
+  --text-muted: #888888;
+  --border:     #e0d9d1;
+  --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =====================================================
+   RESET mínimo
+===================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* body NÃO usa overflow:hidden — causa scroll bloqueado em mobile */
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg-nude);
+  /* overflow controlado apenas onde necessário */
+}
+
+/* =====================================================
+   LAYOUT — Split screen desktop, stack em mobile
+===================================================== */
+.login-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  min-height: 100dvh; /* Safari fix: respeita barra de endereços */
+}
+
+/* =====================================================
+   LEFT — Painel de branding (escuro/dourado)
+===================================================== */
+.login-left {
+  position: relative;
+  background: linear-gradient(160deg, #1a1210 0%, #2d1f15 40%, #3a2419 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  overflow: hidden;
+}
+
+.login-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 20%, rgba(212,163,115,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 80% 80%, rgba(212,163,115,0.1)  0%, transparent 60%);
+  pointer-events: none;
+}
+
+.login-left-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 380px;
+}
+
+/* Logo ícone */
+.login-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  border-radius: 20px;
+  margin-bottom: 32px;
+  box-shadow: 0 20px 50px rgba(212,163,115,0.35);
+}
+
+.login-brand-logo svg {
+  color: #fff;
+}
+
+/* Nome da marca */
+.login-brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 500;
+  letter-spacing: 6px;
+  color: #ffffff;
+  margin-bottom: 6px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+
+.login-brand-tagline {
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  color: var(--gold-light);
+  text-transform: uppercase;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* Divisor */
+.login-divider {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  margin: 36px auto;
+  opacity: 0.6;
+}
+
+/* Citação */
+.login-quote {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+/* Pills decorativas */
+.login-pills {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.login-pill {
+  background: rgba(212,163,115,0.12);
+  border: 1px solid rgba(212,163,115,0.25);
+  color: var(--gold-light);
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 50px;
+}
+
+/* =====================================================
+   ORBS decorativos — respeitam preferência de movimento
+===================================================== */
+.login-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  opacity: 0.12;
+}
+
+.login-orb-1 {
+  width: 300px;
+  height: 300px;
+  background: var(--gold);
+  top: -80px;
+  left: -80px;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+
+.login-orb-2 {
+  width: 200px;
+  height: 200px;
+  background: var(--gold-light);
+  bottom: -40px;
+  right: -40px;
+  animation: orbFloat 10s ease-in-out infinite reverse;
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0)   scale(1);    }
+  33%       { transform: translate(20px, -20px) scale(1.05); }
+  66%       { transform: translate(-15px, 15px) scale(0.97); }
+}
+
+/* Para usuários com preferência por menos animação */
+@media (prefers-reduced-motion: reduce) {
+  .login-orb-1,
+  .login-orb-2 {
+    animation: none;
+  }
+}
+
+/* =====================================================
+   RIGHT — Painel do formulário
+===================================================== */
+.login-right {
+  background: var(--bg-nude);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 50px;
+  position: relative;
+  /* Scroll interno apenas se o conteúdo exceder a viewport */
+  overflow-y: auto;
+}
+
+/* Faixa dourada no topo do painel direito (desktop) */
+.login-right::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
+}
+
+.login-form-wrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Header do form */
+.login-form-header {
+  margin-bottom: 48px;
+}
+
+.login-welcome-tag {
+  display: inline-block;
+  background: rgba(212,163,115,0.1);
+  color: var(--gold-dark);
+  font-size: 0.7rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 50px;
+  border: 1px solid rgba(212,163,115,0.2);
+  margin-bottom: 20px;
+}
+
+.login-form-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: var(--text-main);
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.login-form-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+
+/* ─── Mensagem de erro ─────────────────────────────── */
+.login-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #b94040;
+  background: rgba(185,64,64,0.06);
+  border: 1px solid rgba(185,64,64,0.15);
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin-bottom: 28px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  animation: fadeInDown 0.25s ease;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ─── Input Group ──────────────────────────────────── */
+.input-group {
+  margin-bottom: 24px;
+}
+
+.input-group label {
+  display: block;
+  color: var(--gold-dark);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.login-input-wrapper {
+  position: relative;
+}
+
+.login-input-icon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Ícone sobe a opacidade quando input focado */
+.login-input-wrapper:has(.login-input:focus) .login-input-icon {
+  opacity: 1;
+  color: var(--gold-dark);
+}
+
+.login-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  padding: 16px 18px 16px 48px;
+  border-radius: 16px;
+  color: var(--text-main);
+  font-family: 'Outfit', sans-serif;
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  /* Evita zoom automático em iOS (font-size mínimo 16px) */
+  font-size: max(16px, 0.95rem);
+}
+
+.login-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(212,163,115,0.12), 0 4px 20px rgba(212,163,115,0.08);
+}
+
+.login-input::placeholder {
+  color: #c0b8b0;
+}
+
+/* ─── Botão Entrar ─────────────────────────────────── */
+.btn-entrar {
+  width: 100%;
+  background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+  color: #fff;
+  border: none;
+  padding: 18px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  box-shadow: 0 8px 25px rgba(44,44,44,0.2);
+  position: relative;
+  overflow: hidden;
+  /* Mínimo de área de toque (WCAG 2.5.5) */
+  min-height: 52px;
+}
+
+.btn-entrar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.btn-entrar:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(44,44,44,0.25);
+}
+
+.btn-entrar:hover::after {
+  opacity: 1;
+}
+
+/* Evita hover em touch (evita estado stuck em mobile) */
+@media (hover: none) {
+  .btn-entrar:hover {
+    transform: none;
+    box-shadow: 0 8px 25px rgba(44,44,44,0.2);
+  }
+  .btn-entrar:active::after {
+    opacity: 1;
+  }
+}
+
+.btn-entrar span {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Footer do form ───────────────────────────────── */
+.login-footer {
+  margin-top: 40px;
+  text-align: center;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+
+.login-footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* Touch target */
+  padding: 8px 0;
+}
+
+.login-footer a:hover {
+  color: var(--gold-dark);
+}
+
+/* =====================================================
+   RESPONSIVE
+   Breakpoints: 850px | 600px | 480px | 360px
+===================================================== */
+
+/* ── Tablet: empilha os painéis (850px) ────────────── */
+@media (max-width: 850px) {
+  .login-layout {
+    grid-template-columns: 1fr;
+    /* Remove o min-height fixo para não forçar scroll */
+    min-height: auto;
+  }
+
+  .login-left {
+    padding: 56px 32px;
+    min-height: 300px;
+    /* No mobile a faixa dourada vai no painel esquerdo (topo da página) */
+  }
+
+  /* Faixa dourada migra para o topo do painel esquerdo no mobile */
+  .login-left::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* Faixa original some — o painel direito não é mais o topo */
+  .login-right::before {
+    display: none;
+  }
+
+  .login-right {
+    padding: 48px 28px 56px;
+    /* Sem overflow-y: auto aqui — o body rola normalmente */
+  }
+
+  .login-brand-name {
+    font-size: 2rem;
+    letter-spacing: 5px;
+  }
+
+  .login-quote {
+    font-size: 1rem;
+    margin-bottom: 24px;
+  }
+
+  /* Reduz divider vertical para compactar o painel */
+  .login-divider {
+    margin: 24px auto;
+  }
+}
+
+/* ── Phablet (600px) ───────────────────────────────── */
+@media (max-width: 600px) {
+  .login-left {
+    padding: 44px 24px;
+    min-height: 260px;
+  }
+
+  .login-brand-name {
+    font-size: 1.8rem;
+    letter-spacing: 4px;
+  }
+
+  /* Pills ficam menos visíveis no mobile — reduz ruído visual */
+  .login-pills {
+    display: none;
+  }
+
+  .login-right {
+    padding: 40px 20px 48px;
+  }
+
+  .login-form-header {
+    margin-bottom: 36px;
+  }
+}
+
+/* ── Mobile (480px) ────────────────────────────────── */
+@media (max-width: 480px) {
+  .login-left {
+    padding: 36px 20px;
+    min-height: 240px;
+  }
+
+  .login-brand-logo {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+  }
+
+  .login-brand-name {
+    font-size: 1.55rem;
+    letter-spacing: 4px;
+  }
+
+  .login-brand-tagline {
+    font-size: 0.58rem;
+    letter-spacing: 3px;
+  }
+
+  .login-quote {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    margin-bottom: 0;
+  }
+
+  /* Sem divider em telas pequenas — o quote já vai até a borda */
+  .login-divider {
+    display: none;
+  }
+
+  .login-right {
+    padding: 32px 20px 44px;
+  }
+
+  .login-form-title {
+    font-size: 1.75rem;
+  }
+
+  .login-welcome-tag {
+    font-size: 0.62rem;
+    padding: 5px 12px;
+    margin-bottom: 14px;
+  }
+
+  .login-form-header {
+    margin-bottom: 32px;
+  }
+
+  /* iOS: font-size já é max(16px, ...) no base — aqui apenas ajustes visuais */
+  .login-input {
+    padding: 14px 16px 14px 44px;
+    border-radius: 14px;
+  }
+
+  .btn-entrar {
+    padding: 16px;
+    font-size: 0.78rem;
+    border-radius: 14px;
+    letter-spacing: 1.5px;
+    min-height: 50px;
+  }
+
+  .login-footer {
+    margin-top: 28px;
+    padding-top: 20px;
+  }
+
+  .input-group {
+    margin-bottom: 20px;
+  }
+}
+
+/* ── Telas muito pequenas (360px — Galaxy A, iPhone SE) */
+@media (max-width: 360px) {
+  .login-brand-name {
+    font-size: 1.35rem;
+    letter-spacing: 3px;
+  }
+
+  .login-form-title {
+    font-size: 1.6rem;
+  }
+
+  .login-right {
+    padding: 28px 16px 36px;
+  }
+}
