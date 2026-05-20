@@ -49,6 +49,46 @@ clinica-estetica/
 └── frontend/         # Aplicação React otimizada
 ```
 
+### Arquitetura de Sistemas
+
+```mermaid
+flowchart TD
+    %% Nós do Frontend
+    subgraph Frontend [Frontend - React 19]
+        HP[Página Inicial / Catálogo]
+        LA[Login Administrativo]
+        PA[Painel Administrativo]
+    end
+
+    %% Nós do Backend
+    subgraph Backend [Backend - Vercel Serverless Functions]
+        API_AUTH[Autenticação JWT]
+        API_AGEN[Agendamentos API]
+        API_CLI[Clientes API]
+        API_SERV[Serviços API]
+    end
+
+    %% Banco de Dados
+    DB[(MongoDB Atlas)]
+
+    %% Fluxos Públicos
+    HP -->|Inicia Contato| WAPP[WhatsApp]
+    HP -->|Leitura de Serviços| API_SERV
+    
+    %% Fluxo Administrativo
+    LA -->|Credenciais| API_AUTH
+    API_AUTH -->|Token JWT| PA
+    PA -->|Requests Autenticados| API_AGEN
+    PA -->|Requests Autenticados| API_CLI
+    PA -->|Gerenciamento| API_SERV
+    
+    %% Conexão ao DB
+    API_AUTH --> DB
+    API_AGEN --> DB
+    API_CLI --> DB
+    API_SERV --> DB
+```
+
 **Estratégia de Deploy (Vercel):**
 - O frontend é servido na raiz do domínio e construído através do comando padrão de build do React.
 - O backend atua através de **Serverless Functions** interceptando todas as rotas de API definidas no arquivo `vercel.json`.
