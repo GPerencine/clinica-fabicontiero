@@ -1,128 +1,116 @@
-# Clínica Fabi Contiero
-
 <div align="center">
 
-![Node.js](https://img.shields.io/badge/Node.js-v18%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)
-![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
-![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express&logoColor=white)
-![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
-![SonarQube](https://img.shields.io/badge/Quality-SonarQube-4E9BCD?style=for-the-badge&logo=sonarqube&logoColor=white)
-![Jest](https://img.shields.io/badge/Tests-Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)
+# 🏥 Clínica Fabi Contiero
 
-**Plataforma Full-Stack Serverless para gestão de agendamentos de clínica de estética.**  
-[🔗 Site Oficial](https://fabicontiero.vercel.app/)
+<p>
+  <img src="https://img.shields.io/badge/Node.js-v18+-339933?style=for-the-badge&logo=node.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
+  <img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white" />
+  <img src="https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express&logoColor=white" />
+  <img src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" />
+  <img src="https://img.shields.io/badge/Deploy-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" />
+</p>
+
+**Plataforma full-stack serverless para gestão de agendamentos de clínica de estética.**
+
+[🌐 Acesse o Site](https://fabicontiero.vercel.app/)
 
 </div>
 
 ---
+<div align="center">
+  Desenvolvido por <strong>Gabriel Perencine Lima</strong>
+</div>
 
-## Sobre o Projeto
+## Sobre
 
-Sistema desenvolvido para substituir o agendamento manual da **Clínica Fabi Contiero** por um fluxo digital completo e de alta performance, projetado com uma arquitetura moderna serverless:
+Sistema desenvolvido para digitalizar o fluxo de agendamentos da **Clínica Fabi Contiero**, substituindo processos manuais por uma plataforma moderna com duas frentes integradas:
 
-- **Site Público** — Landing page performática, catálogo de serviços e formulário de agendamento integrado via WhatsApp. Analisada em tempo real pelo **Vercel Speed Insights** e **Vercel Analytics**.
-- **Painel Administrativo** — Gestão de agendamentos, fichas de clientes, histórico de consultas e métricas gerenciais, protegido por autenticação JWT rigorosa.
+- **Site Público** — Landing page, catálogo de serviços e agendamento via WhatsApp, monitorada por Vercel Speed Insights e Analytics.
+- **Painel Administrativo** — Gestão de agendamentos, fichas de clientes, histórico de consultas e métricas gerenciais, protegido por autenticação JWT.
 
 ---
 
-## Stack Tecnológica
+## Funcionalidades
 
-| Camada | Tecnologias |
+| Feature | Descrição |
 |---|---|
-| Backend (API) | Node.js, Express, Mongoose, JWT, bcryptjs, Helmet (Rodando como **Vercel Serverless Functions**) |
-| Frontend | React 19, React Router 7, Axios, Framer Motion, Chart.js, Vercel Analytics |
-| Banco de Dados | MongoDB Atlas (Cluster Nuvem) |
-| Testes | Jest, Supertest, mongodb-memory-server |
-| Qualidade de Código | SonarQube Cloud (Quality Gate Integrado) |
-| Infraestrutura/DevOps | GitHub Actions (CI/CD Automatizado), Vercel |
+| 📅 Agendamento via WhatsApp | Formulário público integrado diretamente ao WhatsApp da clínica |
+| 🔒 Painel Admin com JWT | Acesso protegido e senhas via bcrypt |
+| 👥 Gestão de Clientes | Fichas, histórico de consultas e métricas gerenciais |
+| 📊 Analytics em Tempo Real | Monitoramento de Web Vitals via Vercel Speed Insights |
+| 🛡️ Segurança | CORS restrito, Helmet, SSL MongoDB, headers protegidos via `vercel.json` |
 
 ---
 
-## Arquitetura e Deploy
+## Stack
 
-O projeto está dividido em duas frentes independentes que convergem na mesma plataforma de infraestrutura:
+| Camada | Tecnologia |
+|---|---|
+| **Backend** | Node.js 18+, Express 5, Mongoose, JWT, bcryptjs, Helmet |
+| **Frontend** | React 19, React Router 7, Axios, Framer Motion, Chart.js |
+| **Banco de Dados** | MongoDB Atlas (replica sets, SSL) |
+| **Deploy** | Vercel — API como Serverless Functions, frontend estático |
+| **Testes** | Jest, Supertest, mongodb-memory-server |
+| **Qualidade** | SonarQube Cloud, GitHub Actions (CI/CD) |
 
-```text
-clinica-estetica/
-├── backend/          # API RESTful serverless (/api/*)
-└── frontend/         # Aplicação React otimizada
+---
+
+## Arquitetura
+
+O projeto é dividido em dois diretórios independentes que convergem na mesma plataforma de infraestrutura (Vercel):
+
 ```
-
-### Arquitetura de Sistemas
+clinica-estetica/
+├── backend/     # API RESTful — Vercel Serverless Functions (/api/*)
+└── frontend/    # SPA React otimizada
+```
 
 ```mermaid
 flowchart TD
-    %% Nós do Frontend
-    subgraph Frontend [Frontend - React 19]
-        HP[Página Inicial / Catálogo]
-        LA[Login Administrativo]
-        PA[Painel Administrativo]
-    end
-
-    %% Nós do Backend
-    subgraph Backend [Backend - Vercel Serverless Functions]
-        API_AUTH[Autenticação JWT]
-        API_AGEN[Agendamentos API]
-        API_CLI[Clientes API]
-        API_SERV[Serviços API]
-    end
-
-    %% Banco de Dados
-    DB[(MongoDB Atlas)]
-
-    %% Fluxos Públicos
-    HP -->|Inicia Contato| WAPP[WhatsApp]
-    HP -->|Leitura de Serviços| API_SERV
-    
-    %% Fluxo Administrativo
-    LA -->|Credenciais| API_AUTH
-    API_AUTH -->|Token JWT| PA
-    PA -->|Requests Autenticados| API_AGEN
-    PA -->|Requests Autenticados| API_CLI
-    PA -->|Gerenciamento| API_SERV
-    
-    %% Conexão ao DB
-    API_AUTH --> DB
-    API_AGEN --> DB
-    API_CLI --> DB
-    API_SERV --> DB
+  subgraph Frontend [React 19]
+    HP[Site Público] --> WAPP[WhatsApp]
+    LA[Login Admin] --> PA[Painel Admin]
+  end
+  subgraph Backend [Vercel Serverless Functions]
+    API_AUTH[Auth JWT]
+    API_AGEN[Agendamentos]
+    API_CLI[Clientes]
+    API_SERV[Serviços]
+  end
+  DB[(MongoDB Atlas)]
+  HP --> API_SERV
+  LA --> API_AUTH --> PA
+  PA --> API_AGEN & API_CLI & API_SERV
+  API_AUTH & API_AGEN & API_CLI & API_SERV --> DB
 ```
-
-**Estratégia de Deploy (Vercel):**
-- O frontend é servido na raiz do domínio e construído através do comando padrão de build do React.
-- O backend atua através de **Serverless Functions** interceptando todas as rotas de API definidas no arquivo `vercel.json`.
 
 ---
 
-## Rodando Localmente
+## Configuração Local
+
+**Pré-requisito:** Node.js 18+, cluster MongoDB Atlas (gratuito).
 
 ```bash
-# Clone o repositório
 git clone https://github.com/GPerencine/clinica-fabicontiero.git
 
-# Configuração do Backend
-cd backend 
-npm install 
-cp .env.example .env
-npm run dev   # Executa a API local em http://localhost:3001
+# Backend
+cd backend && npm install && cp .env.example .env
+npm run dev        # http://localhost:3001
 
-# Configuração do Frontend (Em outro terminal)
-cd frontend 
-npm install 
-npm start     # Inicia a interface em http://localhost:3000
+# Frontend (novo terminal)
+cd ../frontend && npm install
+npm start          # http://localhost:3000
 
-# Popular o banco (Criar primeiro usuário admin)
+# Seed do primeiro admin
 cd backend && node seedAdmin.js
 ```
-
-### Variáveis de Ambiente Necessárias
 
 **`backend/.env`**
 ```env
 PORT=3001
 MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/clinica
-SECRET_KEY=chave_jwt_secreta_super_forte
+SECRET_KEY=chave_jwt_forte
 FRONTEND_URL=http://localhost:3000
 NODE_ENV=development
 ```
@@ -130,35 +118,15 @@ NODE_ENV=development
 **`frontend/.env`**
 ```env
 REACT_APP_API_URL=http://localhost:3001/api
-REACT_APP_GOOGLE_MAPS_API_KEY=sua_chave_do_google_maps
+REACT_APP_GOOGLE_MAPS_API_KEY=sua-chave-maps
 ```
 
----
-
-## Testes e Qualidade
-
-O projeto possui rigor na entrega, validado através de fluxos contínuos.
-
-- **Testes Automatizados:** Suíte com testes de integração simulando banco em memória. (Comando: `npm test` no backend).
-- **Code Quality:** Integração oficial com **SonarQube Cloud** via GitHub Actions, com validações de Reliability (Bugs), Security (Vulnerabilidades) e Maintainability (Code Smells).
-- **Performance de Produção:** Monitoramento constante de Web Vitals através do Speed Insights.
-
----
-
-## Segurança e Performance
-
-- Prevenção ativa de Cross-Origin (CORS Restrito a URLs de produção confiáveis).
-- Headers HTTP protegidos pelo Helmet e edge headers da Vercel (`vercel.json`).
-- JWT HS256 para o painel admin (expiração em 8h).
-- Senhas protegidas via bcrypt (Cost 10).
-- Dados do Mongo operando sob SSL e replica sets.
+```bash
+cd backend && npm test   # Testes de integração com banco em memória
+```
 
 ---
 
 ## Licença
 
-Desenvolvido sob contrato para uso privado da Clínica Fabi Contiero. Disponibilizado para fins de portfólio de engenharia de software e arquitetura.
-
----
-
-<div align="center">Desenvolvido por <strong>Gabriel Perencine</strong></div>
+Desenvolvido sob contrato para uso privado da Clínica Fabi Contiero. Disponibilizado para fins de portfólio.
