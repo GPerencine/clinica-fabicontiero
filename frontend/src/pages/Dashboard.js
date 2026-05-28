@@ -45,6 +45,8 @@ function Dashboard() {
   const [servicosDisponiveis, setServicosDisponiveis] = useState([]);
   const [periodoFiltro, setPeriodoFiltro] = useState('Total'); // 'Hoje', '7', '30', 'Total'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [modalConfirmacao, setModalConfirmacao] = useState({ aberto: false, titulo: '', mensagem: '', acaoConfirmar: null });
+  const [textoConfirmacao, setTextoConfirmacao] = useState('');
 
   const buscarDados = useCallback(async () => {
     if (!token) {
@@ -124,9 +126,11 @@ function Dashboard() {
 
   const excluirAgendamento = async (e, id, procedimento) => {
     e.stopPropagation();
-    const confirmacao = globalThis.prompt(`AVISO: Excluir permanentemente o pedido de '${procedimento}'?\nDigite 'deletar' para confirmar:`);
-    
-    if (confirmacao === 'deletar') {
+    setModalConfirmacao({
+      aberto: true,
+      titulo: 'Excluir Agendamento',
+      mensagem: `AVISO: Excluir permanentemente o pedido de '${procedimento}'?\nDigite 'deletar' para confirmar:`,
+      acaoConfirmar: async () => {
         try {
             await api.delete(`/api/agendamentos/${id}`);
             setClienteSelecionado(null);
@@ -136,22 +140,27 @@ function Dashboard() {
             console.error(err);
             showToast("Erro ao excluir.", "error");
         }
-    }
+      }
+    });
   };
 
   const excluirClienteCompleto = async (idCliente, nomeCliente) => {
-      const confirmacao = globalThis.prompt(`Isso apagará TODO o histórico de ${nomeCliente}.\nDigite 'deletar' para confirmar:`);
-      if (confirmacao === 'deletar') {
-          try {
-              await api.delete(`/api/clientes/${idCliente}`);
-              setClienteSelecionado(null);
-              buscarDados();
-              showToast("Cliente removido!");
-          } catch (err) {
-              console.error(err);
-              showToast("Erro ao excluir cliente.", "error");
+      setModalConfirmacao({
+          aberto: true,
+          titulo: 'Excluir Cliente',
+          mensagem: `Isso apagará TODO o histórico de ${nomeCliente}.\nDigite 'deletar' para confirmar:`,
+          acaoConfirmar: async () => {
+              try {
+                  await api.delete(`/api/clientes/${idCliente}`);
+                  setClienteSelecionado(null);
+                  buscarDados();
+                  showToast("Cliente removido!");
+              } catch (err) {
+                  console.error(err);
+                  showToast("Erro ao excluir cliente.", "error");
+              }
           }
-      }
+      });
   };
 
   const clientesAgrupados = React.useMemo(() => {
@@ -330,6 +339,42 @@ function Dashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {modalConfirmacao.aberto && (
+        <div className="sm-confirm-overlay" style={{ zIndex: 9999 }}>
+          <div className="sm-confirm-box">
+            <h4>{modalConfirmacao.titulo}</h4>
+            <p style={{ whiteSpace: 'pre-wrap' }}>{modalConfirmacao.mensagem}</p>
+            <input 
+              type="text" 
+              style={{ width: '100%', marginBottom: '20px', padding: '12px', borderRadius: '12px', border: '1px solid #ccc', fontSize: '1rem' }}
+              placeholder="Digite 'deletar'" 
+              value={textoConfirmacao} 
+              onChange={(e) => setTextoConfirmacao(e.target.value)} 
+            />
+            <div className="sm-confirm-actions">
+              <button 
+                className="sm-btn-cancel" 
+                onClick={() => { setModalConfirmacao({ aberto: false }); setTextoConfirmacao(''); }}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="sm-btn-danger" 
+                disabled={textoConfirmacao !== 'deletar'}
+                style={{ opacity: textoConfirmacao !== 'deletar' ? 0.5 : 1 }}
+                onClick={() => {
+                  modalConfirmacao.acaoConfirmar();
+                  setModalConfirmacao({ aberto: false });
+                  setTextoConfirmacao('');
+                }}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

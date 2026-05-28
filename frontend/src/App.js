@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 
@@ -14,6 +14,15 @@ const Loading = () => (
     <p>Carregando Clínica Fabi Contiero...</p>
   </div>
 );
+
+// Auth Guard Client-Side
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
 /**
  * @component App
@@ -32,8 +41,24 @@ function App() {
             {/* Rota de Login: Acesso secreto para a Fabi */}
             <Route path="/login" element={<Login />} />
 
-            {/* Rota do Painel: Gestão de agendamentos e serviços */}
-            <Route path="/dashboard" element={<Dashboard />} />
+            {/* Rotas Administrativas */}
+            <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute>
+                  <Navigate to="/admin/dashboard" replace />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </Suspense>
       </Router>
