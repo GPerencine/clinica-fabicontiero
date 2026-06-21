@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { RefreshCw, Search, MessageCircle } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-export default function PainelAgendamentos({
+function PainelAgendamentos({
   buscarDados,
   busca,
   setBusca,
@@ -129,3 +129,5 @@ PainelAgendamentos.propTypes = {
   abrirWhatsApp: PropTypes.func.isRequired,
   formatWhatsApp: PropTypes.func.isRequired,
 };
+
+export default React.memo(PainelAgendamentos);

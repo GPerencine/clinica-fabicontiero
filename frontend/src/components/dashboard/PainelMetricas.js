@@ -4,7 +4,7 @@ import { Users, BarChart3, RefreshCw, Sparkles } from 'lucide-react';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import PropTypes from 'prop-types';
 
-export default function PainelMetricas({
+function PainelMetricas({
   periodoFiltro,
   setPeriodoFiltro,
   clientesCount,
@@ -104,3 +104,5 @@ PainelMetricas.propTypes = {
   chartStatusData: PropTypes.object.isRequired,
   chartServicosData: PropTypes.object.isRequired,
 };
+
+export default React.memo(PainelMetricas);

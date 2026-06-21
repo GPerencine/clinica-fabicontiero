@@ -46,22 +46,7 @@ describe('Testes de Cliente', () => {
         await mongoServer.stop();
     });
 
-    test('Verificar existência de cliente por WhatsApp', async () => {
-        const response = await request(app)
-            .get('/api/clientes/11999999999');
-        
-        expect(response.status).toBe(200);
-        expect(response.body.existe).toBe(true);
-        expect(response.body.nome).toBe('João Silva');
-    });
 
-    test('Verificar cliente inexistente', async () => {
-        const response = await request(app)
-            .get('/api/clientes/00000000000');
-        
-        expect(response.status).toBe(200);
-        expect(response.body.existe).toBe(false);
-    });
 
     test('Listar histórico de cliente (Autenticado)', async () => {
         const response = await request(app)

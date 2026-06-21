@@ -1,23 +1,7 @@
 const Cliente = require('../models/Cliente');
 const Agendamento = require('../models/Agendamento');
 
-exports.verificarCliente = async (req, res, next) => {
-  try {
-    const { whatsapp } = req.params; 
-    const cliente = await Cliente.findOne({ whatsapp });
 
-    if (cliente) {
-      return res.json({
-        existe: true,
-        nome: cliente.nome,
-        dataNascimento: cliente.dataNascimento
-      });
-    }
-    res.json({ existe: false });
-  } catch (error) {
-    next(error);
-  }
-};
 
 exports.getHistorico = async (req, res, next) => {
     try {
@@ -54,7 +38,7 @@ exports.atualizarAnotacoes = async (req, res, next) => {
         const cliente = await Cliente.findByIdAndUpdate(
             id,
             { anotacoes },
-            { new: true }
+            { returnDocument: 'after' }
         );
         if (!cliente) {
             return res.status(404).json({ erro: "Cliente não encontrado." });

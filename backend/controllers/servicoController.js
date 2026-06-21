@@ -42,7 +42,7 @@ exports.atualizarServico = async (req, res, next) => {
     if (req.file) {
       dados.imagem = `${getBaseUrl()}/uploads/${req.file.filename}`;
     }
-    const atualizado = await Servico.findByIdAndUpdate(id, dados, { new: true, runValidators: true });
+    const atualizado = await Servico.findByIdAndUpdate(id, dados, { returnDocument: 'after', runValidators: true });
     if (!atualizado) return res.status(404).json({ error: 'Serviço não encontrado' });
     res.json(atualizado);
   } catch (error) {
