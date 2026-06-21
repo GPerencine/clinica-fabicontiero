@@ -73,6 +73,15 @@ const limiter = rateLimit({
 });
 app.use("/api/", limiter);
 
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Muitas tentativas de login vindas deste IP, tente novamente em 15 minutos." }
+});
+app.use("/api/auth/login", loginLimiter);
+
 // --- Conexão com MongoDB ---
 const connectDB = require('./config/db');
 if (process.env.NODE_ENV !== 'test') {

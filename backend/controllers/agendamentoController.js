@@ -22,7 +22,7 @@ exports.agendar = async (req, res, next) => {
             cliente.dataNascimento = dataNascimento || cliente.dataNascimento;
             await cliente.save();
         } else {
-            cliente = new Cliente({ nome, whatsapp, dataNascimento });
+            cliente = new Cliente({ nome, whatsapp: whatsappSanitizado, dataNascimento });
             await cliente.save();
         }
 
@@ -69,7 +69,7 @@ exports.atualizarStatus = async (req, res, next) => {
         const atualizado = await Agendamento.findByIdAndUpdate(
             req.params.id, 
             { status: req.body.status }, 
-            { new: true }
+            { returnDocument: 'after' }
         );
         if (!atualizado) {
             const err = new Error("Agendamento não encontrado");

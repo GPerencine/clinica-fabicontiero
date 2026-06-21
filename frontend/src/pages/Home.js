@@ -13,18 +13,7 @@ function aplicarMascaraWhatsapp(valor) {
   return `(${nums.slice(0, 2)}) ${nums.slice(2, 7)}-${nums.slice(7, 11)}`;
 }
 
-async function buscarClientePorWhatsapp(whatsappLimpo) {
-  const resp = await api.get(`/api/clientes/${whatsappLimpo}`);
-  if (resp.data.existe) {
-    return {
-      nome: resp.data.nome || '',
-      dataNascimento: (resp.data.dataNascimento && typeof resp.data.dataNascimento === 'string')
-        ? resp.data.dataNascimento.split('T')[0]
-        : ''
-    };
-  }
-  return { nome: '', dataNascimento: '' };
-}
+
 // ─────────────────────────────────────────────────────────────────────
 
 function Home() {
@@ -37,6 +26,7 @@ function Home() {
   const [erroForm, setErroForm] = useState('');
   const [mostrarVoltarTopo, setMostrarVoltarTopo] = useState(false);
   const [lgpdAceito, setLgpdAceito] = useState(false);
+  const [carregarMapa, setCarregarMapa] = useState(false);
 
   const [dadosForm, setDadosForm] = useState({
     nome: '',
@@ -87,10 +77,13 @@ function Home() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('visivel');
+            if (entry.target.id === 'map-container-io') {
+              setCarregarMapa(true);
+            }
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+      { threshold: 0.1, rootMargin: '0px 0px 200px 0px' }
     );
 
     // Adding a slight delay to ensure DOM is fully painted after data load
@@ -141,17 +134,7 @@ function Home() {
     }
     if (!lgpdAceito) return setErroForm("Você precisa aceitar a Política de Privacidade para continuar.");
 
-    setCarregando(true);
-    try {
-      const dadosCliente = await buscarClientePorWhatsapp(whatsappLimpo);
-      setDadosForm(prev => ({ ...prev, ...dadosCliente }));
-      setEtapa(2);
-    } catch (e) {
-      console.error("Erro ao verificar cliente:", e);
-      setEtapa(2);
-    } finally {
-      setCarregando(false);
-    }
+    setEtapa(2);
   };
 
   const enviarAgendamento = async () => {
@@ -362,18 +345,24 @@ function Home() {
               <p>Sábado: 09h às 13h</p>
             </div>
           </div>
-          <div className="location-map animar-entrada">
-            <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || ''}>
-              <Map
-                defaultCenter={{ lat: -23.6793169, lng: -46.5380998 }}
-                defaultZoom={16}
-                mapId="DEMO_MAP_ID"
-                style={{ width: '100%', height: '100%', borderRadius: '20px' }}
-                disableDefaultUI={false}
-              >
-                <AdvancedMarker position={{ lat: -23.6793169, lng: -46.5380998 }} />
-              </Map>
-            </APIProvider>
+          <div className="location-map animar-entrada" id="map-container-io">
+            {carregarMapa ? (
+              <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || ''}>
+                <Map
+                  defaultCenter={{ lat: -23.6793169, lng: -46.5380998 }}
+                  defaultZoom={16}
+                  mapId="DEMO_MAP_ID"
+                  style={{ width: '100%', height: '100%', borderRadius: '20px' }}
+                  disableDefaultUI={false}
+                >
+                  <AdvancedMarker position={{ lat: -23.6793169, lng: -46.5380998 }} />
+                </Map>
+              </APIProvider>
+            ) : (
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fdf7f2', borderRadius: '20px', color: '#c5a089' }}>
+                Carregando mapa...
+              </div>
+            )}
           </div>
         </div>
       </section>
