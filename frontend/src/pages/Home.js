@@ -27,6 +27,9 @@ function Home() {
   const [mostrarVoltarTopo, setMostrarVoltarTopo] = useState(false);
   const [lgpdAceito, setLgpdAceito] = useState(false);
   const [carregarMapa, setCarregarMapa] = useState(false);
+  const [carouselPage, setCarouselPage] = useState(0);
+  const carouselRef = useRef(null);
+  const CARDS_POR_PAGINA = 3;
 
   const [dadosForm, setDadosForm] = useState({
     nome: '',
@@ -35,17 +38,7 @@ function Home() {
     dataNascimento: '',
   });
 
-  const carouselRef = useRef(null);
 
-  const scrollCarousel = (direction) => {
-    if (carouselRef.current) {
-      const scrollAmount = 350;
-      carouselRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
-    }
-  };
 
   const carregarServicos = useCallback(async () => {
     try {
@@ -203,45 +196,123 @@ function Home() {
       </section>
 
       <section id="especialidades" className="services-section">
-        <h2 className="section-title">Especialidades</h2>
+        <div className="services-header animar-entrada">
+          <span className="services-eyebrow">NOSSOS TRATAMENTOS</span>
+          <h2 className="section-title">Especialidades</h2>
+          <p className="services-subtitle">Cada procedimento é personalizado para realçar sua beleza com naturalidade e precisão.</p>
+        </div>
 
         <div className="specialty-tabs">
-          {['FACIAL', 'CORPORAL', 'CAPILAR'].map(cat => (
-            <button key={cat} className={`tab-btn ${fluxo === cat ? 'active' : ''}`} onClick={() => setFluxo(cat)}>{cat}</button>
+          {[
+            { cat: 'FACIAL', label: 'Facial', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> },
+            { cat: 'CORPORAL', label: 'Corporal', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2v4M12 18v4M6 12H2M22 12h-4M7.1 7.1L4.3 4.3M19.7 19.7l-2.8-2.8M7.1 16.9l-2.8 2.8M19.7 4.3l-2.8 2.8"/></svg> },
+            { cat: 'CAPILAR', label: 'Capilar', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22c4-4 8-8 8-13a8 8 0 0 0-16 0c0 5 4 9 8 13z"/></svg> },
+          ].map(({ cat, label, icon }) => (
+            <button
+              key={cat}
+              className={`tab-btn ${fluxo === cat ? 'active' : ''}`}
+              onClick={() => { setFluxo(cat); setCarouselPage(0); }}
+            >
+              {icon}
+              <span>{label}</span>
+              {fluxo === cat && <span className="tab-indicator" />}
+            </button>
           ))}
         </div>
 
-        <div className="carousel-wrapper">
-          <button className="carousel-arrow left" onClick={() => scrollCarousel('left')}>&lt;</button>
-          <div className="treatment-grid" ref={carouselRef}>
-            {servicosBanco.filter(s => s.categoria === fluxo).map(servico => (
-              <div className="treatment-card" key={servico._id}>
-                <div className="card-image-container">
-                  {servico.imagem ? (
-                    <img
-                      src={servico.imagem.startsWith('http') ? servico.imagem : `${API_URL}${servico.imagem}`}
-                      alt={servico.titulo}
-                      className="card-img"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="card-icon-fallback">
-                      <Sparkles size={32} color="var(--gold)" />
+        {(() => {
+          const servicosFiltrados = servicosBanco.filter(s => s.categoria === fluxo);
+          const totalPaginas = Math.ceil(servicosFiltrados.length / CARDS_POR_PAGINA);
+          const paginaAtual = Math.min(carouselPage, totalPaginas - 1);
+          const inicio = paginaAtual * CARDS_POR_PAGINA;
+          const servicosVisiveis = servicosFiltrados.slice(inicio, inicio + CARDS_POR_PAGINA);
+
+          const irPara = (pagina) => {
+            setCarouselPage(pagina);
+            carouselRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          };
+
+          return (
+            <>
+              <div className="services-count">
+                <span>
+                  {inicio + 1}–{Math.min(inicio + CARDS_POR_PAGINA, servicosFiltrados.length)} de {servicosFiltrados.length} procedimento{servicosFiltrados.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+
+              <div className="carousel-container" ref={carouselRef}>
+                <button
+                  className="carousel-nav-btn prev"
+                  onClick={() => irPara(paginaAtual - 1)}
+                  disabled={paginaAtual === 0}
+                  aria-label="Procedimentos anteriores"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+
+                <div className="treatment-grid">
+                  {servicosVisiveis.length === 0 ? (
+                    <div className="services-empty">
+                      <Sparkles size={40} color="var(--gold-light)" />
+                      <p>Nenhum procedimento cadastrado nesta categoria.</p>
                     </div>
+                  ) : (
+                    servicosVisiveis.map(servico => (
+                      <div className="treatment-card" key={servico._id}>
+                        <div className="card-image-container">
+                          {servico.imagem ? (
+                            <img
+                              src={servico.imagem.startsWith('http') ? servico.imagem : `${API_URL}${servico.imagem}`}
+                              alt={servico.titulo}
+                              className="card-img"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="card-icon-fallback">
+                              <Sparkles size={36} color="var(--gold)" />
+                              <span>Imagem em breve</span>
+                            </div>
+                          )}
+                          <div className="card-category-badge">{servico.categoria}</div>
+                        </div>
+                        <div className="card-content">
+                          <h4>{servico.titulo}</h4>
+                          <p>{servico.descricao}</p>
+                          <button className="btn-card" onClick={() => abrirModalComServico(servico)}>
+                            Agendar Consulta
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                          </button>
+                        </div>
+                      </div>
+                    ))
                   )}
                 </div>
-                <div className="card-content">
-                  <h4>{servico.titulo}</h4>
-                  <p>{servico.descricao}</p>
-                  <button className="btn-card" onClick={() => abrirModalComServico(servico)}>
-                    Agendar Consulta
-                  </button>
-                </div>
+
+                <button
+                  className="carousel-nav-btn next"
+                  onClick={() => irPara(paginaAtual + 1)}
+                  disabled={paginaAtual >= totalPaginas - 1}
+                  aria-label="Próximos procedimentos"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
               </div>
-            ))}
-          </div>
-          <button className="carousel-arrow right" onClick={() => scrollCarousel('right')}>&gt;</button>
-        </div>
+
+              {totalPaginas > 1 && (
+                <div className="carousel-dots">
+                  {Array.from({ length: totalPaginas }).map((_, i) => (
+                    <button
+                      key={i}
+                      className={`carousel-dot ${i === paginaAtual ? 'active' : ''}`}
+                      onClick={() => irPara(i)}
+                      aria-label={`Página ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })()}
       </section>
 
       <section className="essence-section">
