@@ -329,7 +329,7 @@ body {
 
 .services-count {
     text-align: center;
-    margin-bottom: 48px;
+    margin-bottom: 28px;
 }
 
 .services-count span {
@@ -341,25 +341,98 @@ body {
     padding-bottom: 4px;
 }
 
-/* ================================================= 
-    4. TREATMENT CARDS (Premium Grid)
+/* =================================================
+    4. TREATMENT CARDS (Carousel — 3 por vez)
 ================================================= */
+.carousel-container {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    position: relative;
+}
+
+.carousel-nav-btn {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-main);
+    box-shadow: var(--shadow-sm);
+}
+
+.carousel-nav-btn:hover:not(:disabled) {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(194, 155, 109, 0.3);
+    transform: scale(1.08);
+}
+
+.carousel-nav-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .treatment-grid {
+    flex: 1;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 28px;
+    gap: 24px;
+    min-height: 480px;
+    align-items: start;
 }
 
 @media (max-width: 1100px) {
     .treatment-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    .carousel-nav-btn {
+        display: none;
+    }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 640px) {
     .treatment-grid {
         grid-template-columns: 1fr;
     }
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 36px;
+}
+
+.carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: var(--border);
+    cursor: pointer;
+    padding: 0;
+    transition: var(--transition);
+}
+
+.carousel-dot.active {
+    background: var(--gold);
+    width: 24px;
+    border-radius: 4px;
+}
+
+.carousel-dot:hover:not(.active) {
+    background: var(--gold-light);
 }
 
 .treatment-card {

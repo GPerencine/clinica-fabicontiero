@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import api, { API_URL } from '../api';
 import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,6 +27,9 @@ function Home() {
   const [mostrarVoltarTopo, setMostrarVoltarTopo] = useState(false);
   const [lgpdAceito, setLgpdAceito] = useState(false);
   const [carregarMapa, setCarregarMapa] = useState(false);
+  const [carouselPage, setCarouselPage] = useState(0);
+  const carouselRef = useRef(null);
+  const CARDS_POR_PAGINA = 3;
 
   const [dadosForm, setDadosForm] = useState({
     nome: '',
@@ -208,7 +211,7 @@ function Home() {
             <button
               key={cat}
               className={`tab-btn ${fluxo === cat ? 'active' : ''}`}
-              onClick={() => setFluxo(cat)}
+              onClick={() => { setFluxo(cat); setCarouselPage(0); }}
             >
               {icon}
               <span>{label}</span>
@@ -217,46 +220,99 @@ function Home() {
           ))}
         </div>
 
-        <div className="services-count animar-entrada">
-          <span>{servicosBanco.filter(s => s.categoria === fluxo).length} procedimento{servicosBanco.filter(s => s.categoria === fluxo).length !== 1 ? 's' : ''} disponível{servicosBanco.filter(s => s.categoria === fluxo).length !== 1 ? 'is' : ''}</span>
-        </div>
+        {(() => {
+          const servicosFiltrados = servicosBanco.filter(s => s.categoria === fluxo);
+          const totalPaginas = Math.ceil(servicosFiltrados.length / CARDS_POR_PAGINA);
+          const paginaAtual = Math.min(carouselPage, totalPaginas - 1);
+          const inicio = paginaAtual * CARDS_POR_PAGINA;
+          const servicosVisiveis = servicosFiltrados.slice(inicio, inicio + CARDS_POR_PAGINA);
 
-        <div className="treatment-grid">
-          {servicosBanco.filter(s => s.categoria === fluxo).map(servico => (
-            <div className="treatment-card" key={servico._id}>
-              <div className="card-image-container">
-                {servico.imagem ? (
-                  <img
-                    src={servico.imagem.startsWith('http') ? servico.imagem : `${API_URL}${servico.imagem}`}
-                    alt={servico.titulo}
-                    className="card-img"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="card-icon-fallback">
-                    <Sparkles size={36} color="var(--gold)" />
-                    <span>Imagem em breve</span>
-                  </div>
-                )}
-                <div className="card-category-badge">{servico.categoria}</div>
+          const irPara = (pagina) => {
+            setCarouselPage(pagina);
+            carouselRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          };
+
+          return (
+            <>
+              <div className="services-count">
+                <span>
+                  {inicio + 1}–{Math.min(inicio + CARDS_POR_PAGINA, servicosFiltrados.length)} de {servicosFiltrados.length} procedimento{servicosFiltrados.length !== 1 ? 's' : ''}
+                </span>
               </div>
-              <div className="card-content">
-                <h4>{servico.titulo}</h4>
-                <p>{servico.descricao}</p>
-                <button className="btn-card" onClick={() => abrirModalComServico(servico)}>
-                  Agendar Consulta
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+
+              <div className="carousel-container" ref={carouselRef}>
+                <button
+                  className="carousel-nav-btn prev"
+                  onClick={() => irPara(paginaAtual - 1)}
+                  disabled={paginaAtual === 0}
+                  aria-label="Procedimentos anteriores"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+
+                <div className="treatment-grid">
+                  {servicosVisiveis.length === 0 ? (
+                    <div className="services-empty">
+                      <Sparkles size={40} color="var(--gold-light)" />
+                      <p>Nenhum procedimento cadastrado nesta categoria.</p>
+                    </div>
+                  ) : (
+                    servicosVisiveis.map(servico => (
+                      <div className="treatment-card" key={servico._id}>
+                        <div className="card-image-container">
+                          {servico.imagem ? (
+                            <img
+                              src={servico.imagem.startsWith('http') ? servico.imagem : `${API_URL}${servico.imagem}`}
+                              alt={servico.titulo}
+                              className="card-img"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="card-icon-fallback">
+                              <Sparkles size={36} color="var(--gold)" />
+                              <span>Imagem em breve</span>
+                            </div>
+                          )}
+                          <div className="card-category-badge">{servico.categoria}</div>
+                        </div>
+                        <div className="card-content">
+                          <h4>{servico.titulo}</h4>
+                          <p>{servico.descricao}</p>
+                          <button className="btn-card" onClick={() => abrirModalComServico(servico)}>
+                            Agendar Consulta
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <button
+                  className="carousel-nav-btn next"
+                  onClick={() => irPara(paginaAtual + 1)}
+                  disabled={paginaAtual >= totalPaginas - 1}
+                  aria-label="Próximos procedimentos"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
               </div>
-            </div>
-          ))}
-          {servicosBanco.filter(s => s.categoria === fluxo).length === 0 && (
-            <div className="services-empty">
-              <Sparkles size={40} color="var(--gold-light)" />
-              <p>Nenhum procedimento cadastrado nesta categoria.</p>
-            </div>
-          )}
-        </div>
+
+              {totalPaginas > 1 && (
+                <div className="carousel-dots">
+                  {Array.from({ length: totalPaginas }).map((_, i) => (
+                    <button
+                      key={i}
+                      className={`carousel-dot ${i === paginaAtual ? 'active' : ''}`}
+                      onClick={() => irPara(i)}
+                      aria-label={`Página ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })()}
       </section>
 
       <section className="essence-section">
