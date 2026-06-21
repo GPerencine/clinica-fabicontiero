@@ -1,7 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/((?!api|static|.*\\..*$).*)",
+      "source": "/api/(.*)",
+      "destination": "https://clinica-fabicontiero-a1vc.vercel.app/api/$1"
+    },
+    {
+      "source": "/((?!static|.*\\..*$).*)",
       "destination": "/index.html"
     }
   ]
