@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api, { API_URL } from '../api';
 import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -35,17 +35,7 @@ function Home() {
     dataNascimento: '',
   });
 
-  const carouselRef = useRef(null);
 
-  const scrollCarousel = (direction) => {
-    if (carouselRef.current) {
-      const scrollAmount = 350;
-      carouselRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
-    }
-  };
 
   const carregarServicos = useCallback(async () => {
     try {
@@ -203,44 +193,69 @@ function Home() {
       </section>
 
       <section id="especialidades" className="services-section">
-        <h2 className="section-title">Especialidades</h2>
+        <div className="services-header animar-entrada">
+          <span className="services-eyebrow">NOSSOS TRATAMENTOS</span>
+          <h2 className="section-title">Especialidades</h2>
+          <p className="services-subtitle">Cada procedimento é personalizado para realçar sua beleza com naturalidade e precisão.</p>
+        </div>
 
         <div className="specialty-tabs">
-          {['FACIAL', 'CORPORAL', 'CAPILAR'].map(cat => (
-            <button key={cat} className={`tab-btn ${fluxo === cat ? 'active' : ''}`} onClick={() => setFluxo(cat)}>{cat}</button>
+          {[
+            { cat: 'FACIAL', label: 'Facial', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> },
+            { cat: 'CORPORAL', label: 'Corporal', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2v4M12 18v4M6 12H2M22 12h-4M7.1 7.1L4.3 4.3M19.7 19.7l-2.8-2.8M7.1 16.9l-2.8 2.8M19.7 4.3l-2.8 2.8"/></svg> },
+            { cat: 'CAPILAR', label: 'Capilar', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22c4-4 8-8 8-13a8 8 0 0 0-16 0c0 5 4 9 8 13z"/></svg> },
+          ].map(({ cat, label, icon }) => (
+            <button
+              key={cat}
+              className={`tab-btn ${fluxo === cat ? 'active' : ''}`}
+              onClick={() => setFluxo(cat)}
+            >
+              {icon}
+              <span>{label}</span>
+              {fluxo === cat && <span className="tab-indicator" />}
+            </button>
           ))}
         </div>
 
-        <div className="carousel-wrapper">
-          <button className="carousel-arrow left" onClick={() => scrollCarousel('left')}>&lt;</button>
-          <div className="treatment-grid" ref={carouselRef}>
-            {servicosBanco.filter(s => s.categoria === fluxo).map(servico => (
-              <div className="treatment-card" key={servico._id}>
-                <div className="card-image-container">
-                  {servico.imagem ? (
-                    <img
-                      src={servico.imagem.startsWith('http') ? servico.imagem : `${API_URL}${servico.imagem}`}
-                      alt={servico.titulo}
-                      className="card-img"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="card-icon-fallback">
-                      <Sparkles size={32} color="var(--gold)" />
-                    </div>
-                  )}
-                </div>
-                <div className="card-content">
-                  <h4>{servico.titulo}</h4>
-                  <p>{servico.descricao}</p>
-                  <button className="btn-card" onClick={() => abrirModalComServico(servico)}>
-                    Agendar Consulta
-                  </button>
-                </div>
+        <div className="services-count animar-entrada">
+          <span>{servicosBanco.filter(s => s.categoria === fluxo).length} procedimento{servicosBanco.filter(s => s.categoria === fluxo).length !== 1 ? 's' : ''} disponível{servicosBanco.filter(s => s.categoria === fluxo).length !== 1 ? 'is' : ''}</span>
+        </div>
+
+        <div className="treatment-grid">
+          {servicosBanco.filter(s => s.categoria === fluxo).map(servico => (
+            <div className="treatment-card" key={servico._id}>
+              <div className="card-image-container">
+                {servico.imagem ? (
+                  <img
+                    src={servico.imagem.startsWith('http') ? servico.imagem : `${API_URL}${servico.imagem}`}
+                    alt={servico.titulo}
+                    className="card-img"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="card-icon-fallback">
+                    <Sparkles size={36} color="var(--gold)" />
+                    <span>Imagem em breve</span>
+                  </div>
+                )}
+                <div className="card-category-badge">{servico.categoria}</div>
               </div>
-            ))}
-          </div>
-          <button className="carousel-arrow right" onClick={() => scrollCarousel('right')}>&gt;</button>
+              <div className="card-content">
+                <h4>{servico.titulo}</h4>
+                <p>{servico.descricao}</p>
+                <button className="btn-card" onClick={() => abrirModalComServico(servico)}>
+                  Agendar Consulta
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+          ))}
+          {servicosBanco.filter(s => s.categoria === fluxo).length === 0 && (
+            <div className="services-empty">
+              <Sparkles size={40} color="var(--gold-light)" />
+              <p>Nenhum procedimento cadastrado nesta categoria.</p>
+            </div>
+          )}
         </div>
       </section>
 
